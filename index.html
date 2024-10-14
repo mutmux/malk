@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<title>malk</title>
+		<link href="style.css" rel="stylesheet">
+
+		<script src="offsets.js"></script>
+	</head>
+	<body onload="setActive('game-progress')">
+		<div id="content">
+			<div id="menu">
+				<h1>malk</h1>
+				<h4>save game editor for The Simpsons Hit & Run</h4>
+
+				<!-- save file import and export -->
+				<input type="file" id="picker-import" style="display:none">
+				<label for="picker-import" class="btn btn-picker">⭳ import</label>
+
+				<input type="button" id="picker-export" class="btn btn-picker" value="⭱ export" onclick="writeFile(chosenFilename)" disabled>
+
+				<div id="console"><p>Now with Vitamin R!</p></div>
+			</div>
+
+			<div id="editor">
+				<input type="button" class="btn btn-edit" value="game progress" onclick="setActive('game-progress')">
+				<input type="button" class="btn btn-edit" value="level progress" onclick="setActive('level-progress')">
+
+				<!-- game progress section -->
+				<form id="game-progress" class="sect">
+					<h3>game progress</h3>
+					<p>Values related to overall game progression.</p><br><br>
+
+					<label for="timestamp">timestamp</label>
+					<input type="datetime-local" id="timestamp" placeholder="YYYY/MM/DD HH:MM:SS">
+					<p class="desc">The date and time at the point of saving.</p><br>
+
+					<label for="level-unlocked">last level unlocked</label>
+					<input type="number" id="level-unlocked" min="1" max="7">
+					<p class="desc">The last level unlocked by the player.</p><br>
+
+					<label for="level-played">last level played</label>
+					<input type="number" id="level-played" min="1" max="7">
+					<p class="desc">The last level played. If set higher than the last level unlocked, Level 1 will be loaded instead.</p><br>
+
+					<label for="mission-selected">last mission selected</label>
+					<input type="number" id="mission-selected" min="1" max="8">
+					<p class="desc">The last mission selected on the last level played. All levels have 7 missions, except L1, which starts with an initial tutorial mission.</p><br>
+
+					<label for="coins">coins</label>
+					<input type="number" id="coins" min="0" max="9999999">
+					<p class="desc">Amount of coins currently held by the player. Values over 9,999,999 will cause an integer overflow in-game.</p>
+				</form>
+
+				<!-- level progress section -->
+				<form id="level-progress" class="sect">
+					<h3>level progress</h3>
+					<p>Values related to progression per level.</p>
+
+					<select id="level-select">
+						<option value="1">Level 1</option>
+						<option value="2">Level 2</option>
+						<option value="3">Level 3</option>
+						<option value="4">Level 4</option>
+						<option value="5">Level 5</option>
+						<option value="6">Level 6</option>
+						<option value="7">Level 7</option>
+					</select>
+
+				<!-- cards section -->
+					<h3>cards</h3>
+					<p>Collector card progress for each level.</p>
+					
+					<label for="card-set">card set:</label>
+					<select id="card-set">
+						<option value="1">Level 1</option>
+						<option value="2">Level 2</option>
+						<option value="3">Level 3</option>
+						<option value="4">Level 4</option>
+						<option value="5">Level 5</option>
+						<option value="6">Level 6</option>
+						<option value="7">Level 7</option>
+					</select>
+
+					<input type="button" class="btn btn-edit" id="card-set-lock" value="lock set">
+					<input type="button" class="btn btn-edit" id="card-set-unlock" value="unlock set">
+					<br>
+
+					<div class="card-select">
+						<div class="card"><label><input type="checkbox" id="card-a">A</label></div>
+						<div class="card"><label><input type="checkbox" id="card-b">B</label></div>
+						<div class="card"><label><input type="checkbox" id="card-c">C</label></div>
+						<div class="card"><label><input type="checkbox" id="card-d">D</label></div>
+						<div class="card"><label><input type="checkbox" id="card-e">E</label></div>
+						<div class="card"><label><input type="checkbox" id="card-f">F</label></div>
+						<div class="card"><label><input type="checkbox" id="card-g">G</label></div>
+					</div>
+				</form>
+
+				<br><br><input type="button" class="btn btn-edit" value="⭯ revert" onclick="populateForms()">
+			</div>
+		</div>
+
+		<noscript>D'oh! Malk requires JavaScript to work. Please enable it and refresh the page.</noscript>
+		<script>
+			document.getElementById("editor").style.display = "none";
+			document.getElementById("content").style.display = "inline";
+		</script>
+
+		<script src="utils.js"></script>
+
+		<script>
+			const cout = document.getElementById("console");
+			let chosenFilename = "";
+
+			document.getElementById("picker-import").addEventListener("change", () => {
+				const chosenFile = event.target.files[0];
+				chosenFilename = chosenFile.name;
+
+				// clear any previous output and hide the editor for now...
+				document.getElementById("editor").style.display = "none";
+				if (chosenFile != null) cout.textContent = "";
+
+				tryLoad(chosenFile);
+			});
+
+			function setActive(sect) {
+				// set all other section forms to be hidden, then unhide the chosen one.
+				document.querySelectorAll('.sect').forEach(function(element) {
+					element.style.display = 'none';
+				});
+
+				document.getElementById(sect).style.display = "inline";
+			}
+		</script>
+	</body>
+</html>
